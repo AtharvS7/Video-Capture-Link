@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Emotion Detector</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #1e1e2e;
+      color: #eee;
+      text-align: center;
+      margin: 0;
+      padding: 24px;
+    }
+    h1 { font-weight: 600; }
+    video {
+      border-radius: 12px;
+      max-width: 480px;
+      width: 100%;
+      border: 2px solid #444;
+    }
+    #emotion {
+      font-size: 2.4rem;
+      font-weight: 700;
+      margin: 16px 0 4px;
+      text-transform: capitalize;
+      color: #a6e3a1;
+      min-height: 2.6rem;
+    }
+    #scores {
+      max-width: 360px;
+      margin: 0 auto;
+      text-align: left;
+    }
+    .bar-row { margin: 6px 0; font-size: 0.85rem; }
+    .bar { height: 10px; background: #89b4fa; border-radius: 5px; }
+    .muted { color: #888; font-size: 0.85rem; }
+  </style>
+</head>
+<body>
+  <h1>🎭 Emotion Detector</h1>
+  <video id="video" autoplay playsinline muted></video>
+  <div id="emotion">starting…</div>
+  <div id="scores"></div>
+  <p class="muted">Allow camera access. Updates about once a second.</p>
+
+  <canvas id="canvas" width="320" height="240" style="display:none"></canvas>
+
+  <script>
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const emotionEl = document.getElementById("emotion");
+    const scoresEl = document.getElementById("scores");
+
+    async function start() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+        setInterval(sendFrame, 1000);
+      } catch (err) {
+        emotionEl.textContent = "camera blocked";
+        console.error(err);
+      }
+    }
+
+    let busy = false;
+    async function sendFrame() {
+      if (busy || video.readyState !== 4) return; // skip if backend still working
+      busy = true;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const image = canvas.toDataURL("image/jpeg", 0.7);
+      try {
+        const res = await fetch("/predict", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ image }),
+        });
+        const data = await res.json();
+        if (data.emotion) render(data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        busy = false;
+      }
+    }
+
+    function render(data) {
+      emotionEl.textContent = data.emotion;
+      const sorted = Object.entries(data.scores).sort((a, b) => b[1] - a[1]);
+      scoresEl.innerHTML = sorted
+        .map(
+          ([name, val]) => `
+        <div class="bar-row">
+          ${name} — ${val.toFixed(1)}%
+          <div class="bar" style="width:${Math.max(val, 1)}%"></div>
+        </div>`
+        )
+        .join("");
+    }
+
+    start();
+  </script>
+</body>
+</html>
