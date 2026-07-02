@@ -22,7 +22,9 @@ FACE_CASCADE = cv2.CascadeClassifier(
 )
 
 
-def largest_face(gray):
+def largest_face(img):
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    gray = cv2.equalizeHist(gray)  # normalize lighting -> steadier detection
     faces = FACE_CASCADE.detectMultiScale(
         gray, scaleFactor=1.1, minNeighbors=6, minSize=(80, 80)
     )
@@ -52,15 +54,17 @@ def predict():
         return jsonify({"error": "bad image"}), 400
 
     h, w = img.shape[:2]
-    box = largest_face(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY))
+    box = largest_face(img)
     if box is None:
         return jsonify({"face": False})
 
+    # square crop with ~30% margin, centred on the face. Square matters: the
+    # emotion model resizes to 48x48, so a non-square crop squishes features.
     x, y, fw, fh = box
-    # widen the crop ~20% so the model gets forehead/chin context, then clamp
-    mx, my = int(fw * 0.2), int(fh * 0.2)
-    x0, y0 = max(x - mx, 0), max(y - my, 0)
-    x1, y1 = min(x + fw + mx, w), min(y + fh + my, h)
+    cx, cy = x + fw / 2, y + fh / 2
+    half = int(max(fw, fh) * 0.65)
+    x0, y0 = max(int(cx - half), 0), max(int(cy - half), 0)
+    x1, y1 = min(int(cx + half), w), min(int(cy + half), h)
     face = img[y0:y1, x0:x1]
 
     result = DeepFace.analyze(

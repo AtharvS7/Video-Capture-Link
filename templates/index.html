@@ -7,101 +7,97 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg1: #12121c;
-      --bg2: #1b1b2e;
-      --card: rgba(255, 255, 255, 0.04);
-      --border: rgba(255, 255, 255, 0.09);
-      --accent: #a6e3a1;
-      --text: #e6e6ef;
-      --muted: #8a8aa0;
+      --bg1: #0d0d16;
+      --bg2: #191a2e;
+      --card: rgba(255, 255, 255, 0.045);
+      --border: rgba(255, 255, 255, 0.10);
+      --text: #e8e8f2;
+      --muted: #8b8ba3;
+      --accent: #89b4fa;
     }
     html, body { height: 100%; }
     body {
       font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
       color: var(--text);
-      background: radial-gradient(1200px 700px at 20% 0%, var(--bg2), var(--bg1));
+      background:
+        radial-gradient(1100px 620px at 15% -5%, #24244a 0%, transparent 55%),
+        radial-gradient(900px 600px at 100% 100%, #1e2b3a 0%, transparent 50%),
+        linear-gradient(160deg, var(--bg2), var(--bg1));
       min-height: 100vh;
       display: flex;
       flex-direction: column;
     }
     header {
-      padding: 18px 28px;
+      padding: 16px 30px;
       display: flex;
       align-items: center;
       gap: 12px;
       border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(6px);
     }
-    header h1 { font-size: 1.25rem; font-weight: 600; letter-spacing: 0.2px; }
-    header .dot {
+    header h1 { font-size: 1.2rem; font-weight: 650; letter-spacing: 0.2px; }
+    .dot {
       width: 10px; height: 10px; border-radius: 50%;
-      background: #f38ba8; box-shadow: 0 0 10px #f38ba8;
+      background: #f38ba8; box-shadow: 0 0 12px #f38ba8; transition: 0.3s;
     }
-    header .dot.live { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+    .dot.live { background: #a6e3a1; box-shadow: 0 0 12px #a6e3a1; }
     header small { color: var(--muted); margin-left: auto; }
 
-    main {
-      flex: 1;
-      display: flex;
-      gap: 24px;
-      padding: 24px;
-      align-items: stretch;
-    }
+    main { flex: 1; display: flex; gap: 22px; padding: 22px; align-items: stretch; }
+
     .video-card {
-      flex: 2;
-      position: relative;
-      border-radius: 16px;
-      overflow: hidden;
-      background: #000;
-      border: 1px solid var(--border);
-      min-height: 320px;
-      display: flex;
+      flex: 2; position: relative; border-radius: 18px; overflow: hidden;
+      background: #000; border: 1px solid var(--border);
+      min-height: 340px; display: flex;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.45);
     }
     video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
     #overlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+    .hint {
+      position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%);
+      background: rgba(0,0,0,0.55); padding: 6px 14px; border-radius: 999px;
+      font-size: 0.8rem; color: #cfcfe0; backdrop-filter: blur(4px);
+    }
 
     .panel {
-      flex: 1;
-      min-width: 280px;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 28px;
-      display: flex;
-      flex-direction: column;
+      flex: 1; min-width: 300px; background: var(--card);
+      border: 1px solid var(--border); border-radius: 18px; padding: 30px;
+      display: flex; flex-direction: column;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.35);
     }
-    .now { text-align: center; margin-bottom: 22px; }
-    .emoji { font-size: 4.5rem; line-height: 1; }
+    .now { text-align: center; margin-bottom: 26px; }
+    .emoji {
+      font-size: 5rem; line-height: 1; transition: 0.3s;
+      filter: drop-shadow(0 0 22px var(--glow, transparent));
+    }
     #emotion {
-      font-size: 2rem; font-weight: 700; text-transform: capitalize;
-      margin-top: 8px; color: var(--accent); min-height: 2.4rem;
+      font-size: 2.1rem; font-weight: 700; text-transform: capitalize;
+      margin-top: 10px; min-height: 2.5rem; color: var(--glow, var(--accent));
+      transition: color 0.3s;
     }
-    #confidence { color: var(--muted); font-size: 0.9rem; }
+    #confidence { color: var(--muted); font-size: 0.9rem; margin-top: 2px; }
 
-    .bars { margin-top: auto; }
-    .bar-row { margin: 10px 0; }
+    .bars { margin-top: auto; display: flex; flex-direction: column; gap: 12px; }
     .bar-label {
-      display: flex; justify-content: space-between;
-      font-size: 0.82rem; color: var(--muted); margin-bottom: 4px;
-      text-transform: capitalize;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.82rem; color: #b9b9cc; margin-bottom: 5px; text-transform: capitalize;
     }
-    .bar-track { height: 9px; background: rgba(255,255,255,0.06); border-radius: 6px; overflow: hidden; }
-    .bar-fill {
-      height: 100%; width: 0; border-radius: 6px;
-      background: linear-gradient(90deg, #89b4fa, #a6e3a1);
-      transition: width 0.35s ease;
-    }
-    footer { text-align: center; color: var(--muted); font-size: 0.8rem; padding: 12px; }
+    .bar-label .emo { display: flex; align-items: center; gap: 7px; }
+    .bar-track { height: 10px; background: rgba(255,255,255,0.06); border-radius: 6px; overflow: hidden; }
+    .bar-fill { height: 100%; width: 0; border-radius: 6px; transition: width 0.4s cubic-bezier(.3,.8,.3,1); }
+    footer { text-align: center; color: var(--muted); font-size: 0.78rem; padding: 12px; }
 
-    @media (max-width: 820px) {
+    @media (max-width: 840px) {
       main { flex-direction: column; }
-      .video-card { min-height: 46vh; }
+      .video-card { min-height: 44vh; }
+      .panel { min-width: 0; }
     }
   </style>
 </head>
 <body>
   <header>
     <span class="dot" id="statusDot"></span>
-    <h1>Emotion Detector</h1>
+    <h1>🎭 Emotion Detector</h1>
     <small id="statusText">connecting…</small>
   </header>
 
@@ -109,6 +105,7 @@
     <div class="video-card">
       <video id="video" autoplay playsinline muted></video>
       <canvas id="overlay"></canvas>
+      <div class="hint" id="hint">look at the camera</div>
     </div>
 
     <div class="panel">
@@ -126,53 +123,56 @@
   <canvas id="capture" width="480" height="360" style="display:none"></canvas>
 
   <script>
-    const EMOJI = {
-      happy: "😄", sad: "😢", angry: "😠", surprise: "😲",
-      fear: "😨", disgust: "🤢", neutral: "😐",
+    const EMO = {
+      happy:    { emoji: "😄", color: "#f9e2af" },
+      sad:      { emoji: "😢", color: "#89b4fa" },
+      angry:    { emoji: "😠", color: "#f38ba8" },
+      surprise: { emoji: "😲", color: "#f5c2e7" },
+      fear:     { emoji: "😨", color: "#cba6f7" },
+      disgust:  { emoji: "🤢", color: "#a6e3a1" },
+      neutral:  { emoji: "😐", color: "#94a3b8" },
     };
-    const EMOTIONS = Object.keys(EMOJI);
+    const NAMES = Object.keys(EMO);
 
-    const video = document.getElementById("video");
-    const capture = document.getElementById("capture");
-    const cctx = capture.getContext("2d");
-    const overlay = document.getElementById("overlay");
-    const octx = overlay.getContext("2d");
-    const emojiEl = document.getElementById("emoji");
-    const emotionEl = document.getElementById("emotion");
-    const confEl = document.getElementById("confidence");
-    const barsEl = document.getElementById("bars");
-    const statusDot = document.getElementById("statusDot");
-    const statusText = document.getElementById("statusText");
+    const $ = (id) => document.getElementById(id);
+    const video = $("video"), capture = $("capture"), overlay = $("overlay");
+    const cctx = capture.getContext("2d"), octx = overlay.getContext("2d");
+    const emojiEl = $("emoji"), emotionEl = $("emotion"), confEl = $("confidence");
+    const barsEl = $("bars"), statusDot = $("statusDot"), statusText = $("statusText");
+    const hint = $("hint");
 
-    // pre-build the bar rows once, then just update widths
-    const fills = {};
-    const values = {};
-    for (const name of EMOTIONS) {
+    // build bar rows once
+    const fills = {}, values = {};
+    for (const name of NAMES) {
       const row = document.createElement("div");
-      row.className = "bar-row";
       row.innerHTML = `
-        <div class="bar-label"><span>${name}</span><span data-v>0%</span></div>
+        <div class="bar-label">
+          <span class="emo">${EMO[name].emoji} ${name}</span><span data-v>0%</span>
+        </div>
         <div class="bar-track"><div class="bar-fill"></div></div>`;
       barsEl.appendChild(row);
-      fills[name] = row.querySelector(".bar-fill");
+      const fill = row.querySelector(".bar-fill");
+      fill.style.background = `linear-gradient(90deg, ${EMO[name].color}88, ${EMO[name].color})`;
+      fills[name] = fill;
       values[name] = row.querySelector("[data-v]");
     }
 
-    const history = []; // last few score maps, for smoothing
-    const SMOOTH = 4;
+    const history = [];   // recent score maps
+    const SMOOTH = 5;     // exponential-ish smoothing window
+    let lastBox = null;
 
     async function start() {
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: { width: 640, height: 480 },
-        });
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } });
         video.srcObject = stream;
         statusDot.classList.add("live");
         statusText.textContent = "camera live";
-        setInterval(sendFrame, 700);
+        requestAnimationFrame(drawLoop);
+        setInterval(sendFrame, 600);
       } catch (err) {
         statusText.textContent = "camera blocked";
         confEl.textContent = "please allow camera access and reload";
+        hint.textContent = "camera access denied";
         console.error(err);
       }
     }
@@ -190,51 +190,72 @@
           body: JSON.stringify({ image }),
         });
         handle(await res.json());
-      } catch (err) {
-        console.error(err);
-      } finally {
-        busy = false;
-      }
+      } catch (err) { console.error(err); }
+      finally { busy = false; }
     }
 
     function handle(data) {
       if (!data || !data.face) {
         history.length = 0;
+        lastBox = null;
         confEl.textContent = "no face detected";
-        drawBox(null);
+        hint.textContent = "no face — center yourself";
         return;
       }
+      hint.textContent = "detecting…";
       history.push(data.scores);
       if (history.length > SMOOTH) history.shift();
 
-      const avg = {};
-      for (const name of EMOTIONS) {
-        avg[name] = history.reduce((s, h) => s + (h[name] || 0), 0) / history.length;
+      // weighted average: newer frames count more (weight = position index)
+      const avg = {}; let wsum = 0;
+      history.forEach((h, i) => { wsum += (i + 1); });
+      for (const name of NAMES) {
+        let s = 0;
+        history.forEach((h, i) => { s += (h[name] || 0) * (i + 1); });
+        avg[name] = s / wsum;
       }
       const [top, topVal] = Object.entries(avg).sort((a, b) => b[1] - a[1])[0];
+      const color = EMO[top].color;
 
-      emojiEl.textContent = EMOJI[top] || "🎭";
+      document.documentElement.style.setProperty("--glow", color);
+      emojiEl.textContent = EMO[top].emoji;
       emotionEl.textContent = top;
       confEl.textContent = `${topVal.toFixed(0)}% confident`;
-      for (const name of EMOTIONS) {
+      for (const name of NAMES) {
         fills[name].style.width = Math.max(avg[name], 1) + "%";
         values[name].textContent = avg[name].toFixed(0) + "%";
       }
-      drawBox(data.box);
+      lastBox = { ...data.box, color };
     }
 
-    // draw the face rectangle, mirrored to match the flipped video
-    function drawBox(box) {
+    // continuously redraw the box so it stays smooth and matches the mirrored video
+    function drawLoop() {
       overlay.width = overlay.clientWidth;
       overlay.height = overlay.clientHeight;
       octx.clearRect(0, 0, overlay.width, overlay.height);
-      if (!box) return;
-      const W = overlay.width, H = overlay.height;
-      const x = (1 - box.x - box.w) * W; // mirror X
-      const y = box.y * H;
-      octx.strokeStyle = "#a6e3a1";
-      octx.lineWidth = 3;
-      octx.strokeRect(x, y, box.w * W, box.h * H);
+      if (lastBox) {
+        const W = overlay.width, H = overlay.height;
+        const x = (1 - lastBox.x - lastBox.w) * W; // mirror X to match flipped video
+        const y = lastBox.y * H, bw = lastBox.w * W, bh = lastBox.h * H;
+        octx.strokeStyle = lastBox.color;
+        octx.lineWidth = 3;
+        octx.shadowColor = lastBox.color;
+        octx.shadowBlur = 12;
+        roundRect(octx, x, y, bw, bh, 12);
+        octx.stroke();
+        octx.shadowBlur = 0;
+      }
+      requestAnimationFrame(drawLoop);
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
     }
 
     start();
